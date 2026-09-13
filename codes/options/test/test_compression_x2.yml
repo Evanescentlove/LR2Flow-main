@@ -1,0 +1,76 @@
+#### general settings
+name: Compression_x2_test
+n_channels: 3
+scale: 2
+gpu_ids: [0]
+
+
+datasets:
+  test_1:
+    name: Set5
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+  test_2:
+    name: Set14
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+  test_3:
+    name: BSD100
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+  test_4:
+    name: Urban100
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+  test_5:
+    name: DIV2K-validation
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+
+#### network structures
+network_G:
+  flowstep: 6
+  nn_module: DenseBlock
+  hidden_channels: 48
+  condFlow:
+    flowstep: 4
+    flow_permutation: invconv
+    flow_coupling: Affine
+    feature_extractor: RRDB
+    nn_module: FCN
+    nn_module_last: Conv2dZeros
+    hidden_channels: 96
+    RRDB_nb: [2, 1]
+    RRDB_nf: 96
+    RRDB_gc: 24
+  lf_flow:
+    flowstep: 6
+    hidden_channels: 32
+    condFlow:
+      flowstep: 4
+      hidden_channels: 32
+      RRDB_nb: [1, 1]
+      RRDB_nf: 32
+      RRDB_gc: 16
+
+
+#### validation settings
+val:
+  heat: 0.0
+  comp_quality: [30, 50, 70, 80, 90]
+
+
+path:
+  strict_load: true
+  load_submodule: ~
+  pretrain_model_G: ../experiments/pretrained_models/compression_x2.pth  # ../experiments/pretrained_models/compression_x2(R).pth

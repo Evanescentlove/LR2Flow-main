@@ -1,0 +1,98 @@
+#### general settings
+name: DIV2K_x2_rescaling
+n_channels: 3
+scale: 2
+gpu_ids: [0]
+
+
+#### datasets
+datasets:
+  train:
+    name: DIV2K-train
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+    use_shuffle: true
+    n_workers: 6
+    batch_size: 16
+    GT_size: 160
+    use_flip: true
+    use_rot: true
+    color: RGB
+
+  val:
+    name: DIV2K-val
+    mode: GTLQx
+    dataroot_GT: ~
+    dataroot_LQ: ~
+
+
+# The optimization may not be stable for rescaling (+-0.1dB). A simple trick: for each stage of learning rate,
+#  resume training from the best model of the previous stage of learning rate.
+#### network structures
+network_G:
+  flowstep: 6
+  nn_module: DenseBlock
+  hidden_channels: 32
+  condFlow:
+    flowstep: 4
+    flow_permutation: invconv
+    flow_coupling: Affine
+    feature_extractor: RRDB
+    nn_module: FCN
+    nn_module_last: Conv2dZeros
+    hidden_channels: 64
+    RRDB_nb: [2, 1]
+    RRDB_nf: 64
+    RRDB_gc: 16
+  lf_flow:
+    flowstep: 6
+    hidden_channels: 32
+    condFlow:
+      flowstep: 4
+      hidden_channels: 32
+      RRDB_nb: [1, 1]
+      RRDB_nf: 32
+      RRDB_gc: 16
+
+
+#### path
+path:
+  pretrain_model_G: ~
+  strict_load: true
+  resume_state: auto
+
+#### training settings: learning rate scheme, loss
+train:
+  lr_G: !!float 2e-4
+  max_grad_clip: 5
+  max_grad_norm: 100
+  beta1: 0.9
+  beta2: 0.99
+  niter: 500000
+  lr_steps: [100000, 200000, 300000, 350000, 400000, 450000]
+  lr_gamma: 0.5
+
+  weight_hr: 1.0
+  weight_lr: !!float 5e-2
+  weight_z: !!float 1e-5
+  weight_lf: !!float 5e-1
+
+  add_noise_prob: 1.0
+  noise_scale_y: !!float 1e-4
+
+  heat: 1.0
+  manual_seed: 0 
+
+
+#### validation settings
+val:
+  heats: [0.]
+  n_sample: 1
+  val_freq: 5000
+
+
+#### logger
+logger:
+  print_freq: 200
+  save_checkpoint_freq: 5000
