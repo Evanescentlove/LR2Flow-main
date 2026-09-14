@@ -95,6 +95,7 @@ python3 train_compression.py --opt options/train/train_compression_x2.yml
 python3 train_denoising.py --opt options/train/train_denoising.yml
 ```
 
+<!--
 ## Citation
 
 If you find this work useful for your research, please consider citing our paper:
@@ -107,6 +108,7 @@ If you find this work useful for your research, please consider citing our paper
   year    = {2026}
 }
 ```
+-->
 
 ## Acknowledgements
 
